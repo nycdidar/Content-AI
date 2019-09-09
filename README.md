@@ -26,19 +26,22 @@ Content editors/writers are the heart of any digital news space. This starter ki
 
 ### Algorithm Used
 ![Recurrent Neural Network](https://qph.fs.quoracdn.net/main-qimg-6eced51767f5bcd94b32bbe50da438e9 "Recurrent Neural Network")
+
 [Recurrent Neural Network (RNN)](https://en.wikipedia.org/wiki/Recurrent_neural_network)
 
 ![Naive Bayes classifier](https://provalisresearch.com/uploads/linear_vs_nonlinear_problems.png "Naive Bayes classifier")
+
 [Naive Bayes classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)
 
 ![Natural language processing](https://deeplearninganalytics.org/wp-content/uploads/2019/04/nlp.png "Natural language processing")
+
 [Natural language processing (NLP)](https://en.wikipedia.org/wiki/Natural_language_processing)
 
 ### Examples
 ##### Classify title
 `curl http://localhost:5004/classify_title?title=Video shows jaw-dropping scale of Dorian's ferocious hit on the Bahamas`
 
-Response:
+Example Response:
 `[{"category":"news","probability":"0.9941731"},{"category":"tech","probability":"0.0047676545"},{"category":"politics","probability":"0.0007970525"},{"category":"health","probability":"0.00026003388"},{"category":"business","probability":"2.2758081e-06"}]`
 ##### Classify breaking news
 `curl http://localhost:5004/classify_breaking?title=Watch live: Latest on Hurricane Dorian as it move up U.S. coast`
@@ -52,7 +55,6 @@ Example Response:
 
 Example Response:
 `[["London","B-LOC"],["you","O"],["Trump","B-PER"].....`
-
 
 ##### Predict Content Category
 `curl 'http://localhost:5004/predict_vertical' --data 'content=<YOUR LARGE CONTENT BLOB>'`
