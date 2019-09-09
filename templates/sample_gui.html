@@ -1,0 +1,548 @@
+<!-- THIS IS JUST AN EXAMPLE GUI FORM -->
+<!-- IT IS NOT PART OF THE APPLICATION -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../../../favicon.ico">
+
+    <title>Content AI</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="static/css/dashboard.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="static/css/style.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Content AI</a>
+      <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+      <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+          <a class="nav-link" href="#">Sign out</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">
+                  <span data-feather="home"></span>
+                  Dashboard <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file"></span>
+                  Articles
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="shopping-cart"></span>
+                  Images
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="layers"></span>
+                  Settings
+                </a>
+              </li>
+            </ul>
+
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>More Settings</span>
+              <a class="d-flex align-items-center text-muted" href="#">
+                <span data-feather="plus-circle"></span>
+              </a>
+            </h6>
+            <ul class="nav flex-column mb-2">
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  Configs
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  Nothing
+                </a>
+              </li>
+            </ul>
+
+            <div id="popular_news"></div>
+          </br>
+            <div id="breaking_news"></div>
+          </br>
+            <div id="text_keywords"></div>
+            <div id="image_person"></div>
+            <div id="image_caption"></div>
+            <div id="image_classify"></div>
+          </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            
+            <h1 class="h2" contenteditable="true" class="my_header" id="my_header">Watch live: Latest on Hurricane Dorian as it moves up U.S. coast</h1>
+           
+            <div class="btn-toolbar mb-2 mb-md-0">
+              <div class="btn-group mr-2">
+
+                <div id = "suggested_words">
+                  <button class="btn btn-sm btn-outline-secondary" id="pred1"></button>
+                  <button class="btn btn-sm btn-outline-secondary" id="pred2"></button>
+                  <button class="btn btn-sm btn-outline-secondary" id="pred3"></button>
+                </div>
+
+                <button class="btn btn-sm btn-outline-secondary">Save</button>
+                <button class="btn btn-sm btn-outline-secondary">Cancel</button>
+              </div>
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                <span data-feather="calendar"></span>
+                Publish
+              </button>
+            </div>
+          </div>
+
+          <div contenteditable="true" id="my_wsywig" class="my_wsywig">Click here, then start typing!</div>
+          <div id="ner_details"></div>
+          
+        </main>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="static/js/jquery.min.js"><\/script>')</script>
+    <script src="static/js/popper.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
+
+
+    <script>
+
+      const apiURL = 'http://localhost:5004';
+      //const apiURL = 'http://content-ai.rtwod.com';
+      const apiImageURL = 'http://localhost:5002';
+      //const apiImageURL = 'http://image-ai.rtwod.com';
+
+      let theTextBox = document.getElementById('my_wsywig');
+      let my_header = document.getElementById('my_header');
+      let capsLockKey = document.getElementById('20');
+      let shiftKey = document.getElementById('16');
+      var pred1 = document.getElementById("pred1");
+      var pred2 = document.getElementById("pred2");
+      var pred3 = document.getElementById("pred3");
+
+      function roundUp(input) {
+        input = input * 100;
+        return parseInt(input);
+      }
+
+      function validURL(str) {
+        regexp = /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+        if (regexp.test(str)) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+
+
+
+
+      function classify_image(inputData) {
+        $.ajax({
+          url: `${apiImageURL}/predict_image`,
+          type: 'GET',
+          data: {
+            'url': inputData,
+          },
+          success: function (response) {
+
+            console.log("Prediction Response", response);
+            let confidence = parseInt(response.confidence);
+            document.getElementById("image_caption").innerHTML = `
+                  </br> <strong> Object/Items Found: </strong> </br>
+                  <button type="button" class="btn btn-danger">  ${response.Prediction} ${confidence}% </button>&nbsp;</br>
+                  `;
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function detect_person(inputData) {
+        $.ajax({
+          url: `${apiImageURL}/detect_person`,
+          type: 'GET',
+          data: {
+            'url': inputData,
+          },
+          success: function (response) {
+
+            console.log("Prediction Response", response.captions.Prediction);
+            document.getElementById("image_person").innerHTML = `
+                </br> <strong> Detected Person: </strong> </br>
+                <button type="button" class="btn btn-danger">  ${response.captions.Prediction} </button>&nbsp;</br>
+                `;
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function image_labeling(inputData) {
+        $.ajax({
+          url: `${apiImageURL}/image_caption`,
+          type: 'GET',
+          data: {
+            'url': inputData,
+          },
+          success: function (response) {
+            console.log("Prediction Response", response.captions);
+            let keywords = '';
+            for (const key of response.captions) {
+              //console.log(key, response.keywords[key])
+              keywords += (key) ? `<li> ${key}</li>&nbsp;` : '';
+            }
+            document.getElementById("image_classify").innerHTML = `</br> <strong> Image Analysis: </strong> </br> <ul>${keywords} </ul>`;
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function smart_crop(inputData) {
+        $.ajax({
+          url: `${apiImageURL}/smart_crop`,
+          type: 'GET',
+          data: {
+            'url': inputData,
+          },
+          success: function (response) {
+            console.log("Prediction Response", response);
+            theTextBox.innerHTML = `<h3> Face Priority Crop </h3> <img src ="${apiImageURL}/${response.url}/">`;
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function ner_detect(inputData) {
+        $.ajax({
+          url: `${apiURL}/ner`,
+          type: 'GET',
+          data: {
+            'content': theTextBox.innerHTML.replace(/&nbsp;/g, ''),
+          },
+          success: function (response) {
+            console.log("Prediction Response", response);
+            let keywords = '';
+            console.log("DATA", response)
+            for (const key of response) {
+
+              //console.log("XXX ", key[0]);
+              //console.log("YYY ", key[1]);
+
+              if ((key[1] == "B-PER" || key[1] == "I-PER") && key[0].length > 3) {
+                keywords += (key) ? `<button type="button" class="btn btn-danger">  ${key[0]} </button>&nbsp;` : '';
+              }
+              if (key[1] == "B-LOC" || key[1] == "I-LOC" || key[1] == "B-ORG" || key[1] == "I-ORG") {
+                keywords += (key) ? `<button type="button" class="btn btn-info">  ${key[0]} </button>&nbsp;` : '';
+              }
+              if (key[1] == "B-MISC") {
+                keywords += (key) ? `<button type="button" class="btn btn-warning">  ${key[0]} </button>&nbsp;` : '';
+              }
+            }
+
+            document.getElementById("ner_details").innerHTML = `</br> <strong> Named Entity Recognition (NER): </strong> </br> ${keywords}`;
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function handlePasteContentBody(e) {
+        // cancel paste
+        e.preventDefault();
+        // get text representation of clipboard
+        var text = (e.originalEvent || e).clipboardData.getData('text/plain');
+        // insert text manually
+        document.execCommand("insertHTML", false, text);
+
+        if (validURL(text)) {
+          classify_image(text)
+          detect_person(text)
+          image_labeling(text)
+          smart_crop(text)
+        } else {
+          // Run classify vertical if long sentence
+          if (text.length > 500) {
+            classify_vertical(text);
+          }
+        }
+      }
+
+      function classify_vertical(inputData) {
+        $.ajax({
+          url: `${apiURL}/predict_vertical`,
+          type: 'POST',
+          data: {
+            'content': inputData,
+          },
+          success: function (response) {
+
+            console.log("Prediction Response", response);
+            const keys = Object.keys(response.keywords)
+            let keywords = '';
+            for (const key of keys) {
+              console.log(key, response.keywords[key])
+              response.keywords[key] = response.keywords[key] * 100;
+              response.keywords[key] = parseInt(response.keywords[key]);
+              keywords += (key) ? `<button type="button" class="btn btn-primary"> ${key} ${response.keywords[key]}% </button>&nbsp;` : '';
+            }
+
+            document.getElementById("text_keywords").innerHTML = `
+                    <button type="button" class="btn btn-danger"> ${response.vertical_type} </button>&nbsp;</br>
+                    <strong> High Value Keywords Found </strong></br>
+                    ${keywords}`;
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+
+      function strip(html) {
+        var tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+      }
+
+      //Function that clears the text box
+      function clearText() {
+        // Clear only if few words. 
+        if (theTextBox.innerHTML.length < 40) {
+          theTextBox.innerHTML = '';
+        }
+
+      }
+
+      //Function that detects keypresses and does the appropriate things
+      function highlightAndType(e) {
+        var keyPressed = e.keyCode;
+        var charPressed = e.key;
+        const keys = document.getElementById(keyPressed);
+        // Run only if under few words.
+        if (theTextBox.innerHTML.length < 40) {
+          if (keyPressed == 32) {
+            doWork(theTextBox.innerHTML.slice(0, -1), 'pred');
+          }
+          else doWork(theTextBox.innerHTML, 'med');
+        } else {
+
+          if (theTextBox.innerHTML.length > 500) {
+            classify_vertical(theTextBox.innerHTML);
+          }
+        }
+      }
+
+
+      function doWork(str, work) {
+        let randomNum = 0;
+        let btnColor = ['btn-warning', 'btn-success', 'btn-primary'];
+        // console.log(btnColor[randomNum]);
+
+        str = str.replace(/<br>/g, '');
+        console.log("STRING VAL: ", str);
+        console.log("WORK VAL: ", work);
+
+        // ajax the JSON to the server
+        $.ajax({
+          url: `${apiURL}/output`,
+          type: 'GET',
+          data: {
+            'string': str,
+            'work': work
+          },
+          //dataType:'json',
+
+          //contentType: 'application/json;charset=UTF-8',
+          success: function (response) {
+
+            console.log("Prediction Response A: ", response.predictions);
+            // var obj = JSON.parse(response.predictions);
+            var obj = response.predictions;
+            console.log("Prediction Response B: ", obj);
+
+            //randomNum = Math.floor(Math.random() * 2) + 0;
+            //let predict_1 = (obj[0]) ? `<button type="button" class="btn ${btnColor[randomNum]}"> ${obj[0][0]} </button>` : '';
+            let predict_1 = (obj[0]) ? `<button type="button" class="btn btn-primary"> ${obj[0][0]} </button>` : '';
+            //randomNum = Math.floor(Math.random() * 2) + 0;
+            //let predict_2 = (obj[1]) ? `<button type="button" class="btn ${btnColor[randomNum]}"> ${obj[1][0]} </button>` : '';
+            let predict_2 = (obj[1]) ? `<button type="button" class="btn btn-primary"> ${obj[1][0]} </button>` : '';
+            //randomNum = Math.floor(Math.random() * 2) + 0;
+            //let predict_3 = (obj[2]) ? `<button type="button" class="btn ${btnColor[randomNum]}"> ${obj[2][0]} </button>` : '';
+            let predict_3 = (obj[2]) ? `<button type="button" class="btn btn-primary"> ${obj[2][0]} </button>` : '';
+
+            let spell_suggest = (response.spell_suggestion) ? `<button type="button" class="btn btn-warning"> ${response.spell_suggestion} </button><button type="button" class="btn btn-light">&nbsp; &nbsp; &nbsp;</button>` : '';
+
+            console.log('THIS IS TEST 1: ', predict_1);
+            console.log('THIS IS TEST 2: ', predict_2);
+            console.log('THIS IS TEST 3: ', predict_3);
+            document.getElementById("suggested_words").innerHTML = `${spell_suggest} &nbsp; ${predict_1} ${predict_2} ${predict_3}`;
+
+            //alert("Success");
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function classify_breaking(inputData) {
+        $.ajax({
+          url: `${apiURL}/classify_breaking`,
+          type: 'GET',
+          data: {
+            'title': inputData,
+          },
+          success: function (response) {
+            console.log("Prediction Response", response);
+            const keys = Object.keys(response)
+            let keywords = '';
+            for (const key of keys) {
+              console.log(key, response[key])
+              response[key].probability = response[key].probability * 100;
+              response[key].probability = parseInt(response[key].probability);
+              if (response[key].probability > 40) {
+                if (response[key].category == 'breaking') {
+                  keywords += (key) ? `<button type="button" class="btn btn-success"> Breaking News ${response[key].probability}% </button>&nbsp; </br></br>` : '';
+                }
+              }
+            }
+            document.getElementById("breaking_news").innerHTML = `${keywords}`;
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function classify_popular(inputData) {
+        $.ajax({
+          url: `${apiURL}/classify_popular`,
+          type: 'GET',
+          data: {
+            'title': inputData,
+          },
+          success: function (response) {
+            console.log("Prediction Response", response);
+            const keys = Object.keys(response)
+            let keywords = '';
+            for (const key of keys) {
+              console.log(key, response[key])
+              response[key].probability = response[key].probability * 100;
+              response[key].probability = parseInt(response[key].probability);
+              if (response[key].probability > 40) {
+                if (response[key].category == 'popular') {
+                  keywords += (key) ? `<button type="button" class="btn btn-info"> High Page View ${response[key].probability}% </button>&nbsp; </br></br>` : '';
+                }
+              }
+            }
+            document.getElementById("popular_news").innerHTML = `${keywords}`;
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function classify_title(inputData) {
+        $.ajax({
+          url: `${apiURL}/classify_title`,
+          type: 'GET',
+          data: {
+            'title': inputData,
+          },
+          success: function (response) {
+            console.log("Prediction Response", response);
+            const keys = Object.keys(response)
+            let keywords = '';
+            for (const key of keys) {
+              console.log(key, response[key])
+              response[key].probability = response[key].probability * 100;
+              response[key].probability = parseInt(response[key].probability);
+              if (response[key].probability > 40) {
+                keywords += (key) ? `<button type="button" class="btn btn-danger"> ${response[key].category} ${response[key].probability}% </button>&nbsp;` : '';
+              }
+            }
+            document.getElementById("text_keywords").innerHTML = `${keywords}`;
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function headerKeyUpHandler(e) {
+        classify_title(my_header.innerHTML);
+        classify_breaking(my_header.innerHTML);
+        classify_popular(my_header.innerHTML);
+      }
+      function headerPasteHandler(e) {
+        // cancel paste
+        e.preventDefault();
+        // get text representation of clipboard
+        var text = (e.originalEvent || e).clipboardData.getData('text/plain');
+        // insert text manually
+        document.execCommand("insertHTML", false, text);
+        classify_title(my_header.innerHTML);
+        classify_breaking(my_header.innerHTML);
+        classify_popular(my_header.innerHTML);
+      }
+
+      //window.addEventListener('keyup', highlightAndType);
+      document.getElementById('my_wsywig').addEventListener("keyup", highlightAndType);
+      document.getElementById('my_wsywig').addEventListener("paste", handlePasteContentBody);
+      document.getElementById('my_wsywig').addEventListener("blur", ner_detect);
+      document.getElementById('my_header').addEventListener("paste", headerPasteHandler);
+      document.getElementById('my_header').addEventListener("keyup", headerKeyUpHandler);
+      window.addEventListener('click', clearText);
+
+
+    </script>
+
+
+  </body>
+</html>
