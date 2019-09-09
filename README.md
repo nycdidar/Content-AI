@@ -3,7 +3,8 @@
 Content AI framework/starter kit.
 
 #### Goal
-Content editors/writers are the heart of any digital news space. This starter kit API can make content publishing tools (curation, cms, api or even FE apps) better, faster and smarter. 
+Content editors/writers are the heart of any digital news space. This starter kit API can make content publishing tools better, faster and smarter. For ex: curation, cms, api, any application backend or even FE apps.  
+
 ##### Core Benefits
 * Reduces UI components.
 * Saves time in writing stories.
@@ -67,12 +68,21 @@ Example Response:
 =============================================
 ##### Deploy (Using Docker Compose)
 `cd docker`
+
 `docker-compose up -d`
 
 ##### Deploy (Native)
 `cd docker`
+
 `pip install -r requirements.txt `
+
+`cd ..`
+
 `python server.py`
+
+Visit http://localhost:5004/test to play around with example GUI.
+
+##### THIS IS WORK IN PROGRESS.
 
 #### TO DO
 - Organize files/folders.
