@@ -24,7 +24,7 @@ Content editors/writers are the heart of any digital news space. This starter ki
 ##### Context specific spell checker.
 ##### Extract keywords & weights.
 
-###Algorithm Used
+### Algorithm Used
 ![Recurrent Neural Network](https://qph.fs.quoracdn.net/main-qimg-6eced51767f5bcd94b32bbe50da438e9 "Recurrent Neural Network")
 [Recurrent Neural Network (RNN)](https://en.wikipedia.org/wiki/Recurrent_neural_network)
 
@@ -34,7 +34,7 @@ Content editors/writers are the heart of any digital news space. This starter ki
 ![Natural language processing](https://deeplearninganalytics.org/wp-content/uploads/2019/04/nlp.png "Natural language processing")
 [Natural language processing (NLP)](https://en.wikipedia.org/wiki/Natural_language_processing)
 
-###Examples
+### Examples
 ##### Classify title
 `curl http://localhost:5004/classify_title?title=Video shows jaw-dropping scale of Dorian's ferocious hit on the Bahamas`
 
