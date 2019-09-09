@@ -65,6 +65,26 @@ Example Response:
 
 `{"keywords":{"politics":0.179,"obama":0.179,"election":0.179,"sanders":0.179......}}`
 
+##### Predict Next Word
+`curl 'http://localhost:5004/output?string=financial&work'`
+
+Example Response:
+`{  
+   predictions:[   
+         "planning"
+   ]
+}`
+
+##### Context Based Spell Checker
+`curl 'http://localhost:5004/output?string=financd'`
+
+Example Response:
+
+`{
+  spell_suggestion:"finance"
+}`
+
+
 =============================================
 ##### Deploy (Using Docker Compose)
 `cd docker`
