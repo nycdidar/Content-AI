@@ -19,6 +19,7 @@ import modules.predictword as predictword
 import modules.verticalclassify as verticalclassify
 import modules.classifybreaking as classifybreaking
 import modules.classifypopular as classifypopular
+import modules.datasearch as datasearch
 from modules.ner import Parser
 
 # JSON display handler.
@@ -80,6 +81,11 @@ def worker():
     string = request.args.get('string')
     work = request.args.get('work')
     return predictword.predict_word(work, string)
+
+# Classify popular news
+@app.route("/search")
+def wiki_search():
+    return display_msg(request, datasearch.classify_title, 'content')
 
 # Classify named entity recognition
 @app.route("/ner",  methods=['GET', 'POST'])

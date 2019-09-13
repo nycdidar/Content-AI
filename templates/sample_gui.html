@@ -83,6 +83,7 @@
               </li>
             </ul>
 
+            
             <div id="popular_news"></div>
           </br>
             <div id="breaking_news"></div>
@@ -91,6 +92,8 @@
             <div id="image_person"></div>
             <div id="image_caption"></div>
             <div id="image_classify"></div>
+            <div id="search_image"></div>
+            
           </div>
         </nav>
 
@@ -119,6 +122,7 @@
           </div>
 
           <div contenteditable="true" id="my_wsywig" class="my_wsywig">Click here, then start typing!</div>
+          <div id="search_details"></div>
           <div id="ner_details"></div>
           
         </main>
@@ -170,9 +174,6 @@
           return false;
         }
       }
-
-
-
 
       function classify_image(inputData) {
         $.ajax({
@@ -342,6 +343,24 @@
         });
       }
 
+        function content_search(inputData) {
+          $.ajax({
+            url: `${apiURL}/search`,
+            type: 'GET',
+            data: {
+              'content': inputData,
+            },
+            success: function (response) {
+              console.log("Search Response", response);
+              document.getElementById("search_details").innerHTML = `</br>${response.content}`;
+              // document.getElementById("search_image").innerHTML = `<img src = "${response.image}">`;
+            },
+            error: function (error) {
+              console.log(error);
+            }
+          });
+        }
+
 
       function strip(html) {
         var tmp = document.createElement("DIV");
@@ -367,6 +386,7 @@
         if (theTextBox.innerHTML.length < 40) {
           if (keyPressed == 32) {
             doWork(theTextBox.innerHTML.slice(0, -1), 'pred');
+            content_search(theTextBox.innerHTML.replace(/&nbsp;/g, ''));
           }
           else doWork(theTextBox.innerHTML, 'med');
         } else {

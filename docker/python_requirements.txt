@@ -10,3 +10,4 @@ matplotlib==3.0.3
 torch==1.2.0
 simplejson==3.16.0
 nltk==3.4.5
+wikipedia==1.4.0

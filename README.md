@@ -11,6 +11,7 @@ Content editors/writers are the heart of any digital news space. This starter ki
 * Helps writing better stories.
 * Reduces 'time to 1st publish' duration.
 
+### Example UI Integration
 ![Content AI ](static/images/content-ai.jpg "Content AI ")
 
 #### Features
@@ -18,6 +19,7 @@ Content editors/writers are the heart of any digital news space. This starter ki
 ##### Classify breaking news.
 ##### Classify content category or type.
 ##### Predict probability of high traffic content.
+##### Display wikipedia summery as you type.
 ##### Using facial recognition detect political figures to automatically select taxonomy or content category. [Image-AI](https://github.com/nycdidar/Image-AI)
 ##### Find image caption by image URL. [Image-AI](https://github.com/nycdidar/Image-AI)
 ##### Analyze image based on several pre trained image models. [Image-AI](https://github.com/nycdidar/Image-AI)
